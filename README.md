@@ -11,6 +11,6 @@ This program have several parts:
 
 ## Usage
 
-You can go repository, clone it and open it by clicing on index.html
+You can go to repository, clone it and open it by clicing on index.html
 
 Go to https://santeri13.github.io/graphql
