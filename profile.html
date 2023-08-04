@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Profile</title>
+  <link rel="stylesheet" type="text/css" href="css/profile.css">
+</head>
+<body>
+  <div class="container">
+    <h1>User Profile</h1>
+    <div class="profile-info">
+      <div><strong>ID:</strong> <span id="ID"></span></div>
+      <div><strong>Username:</strong> <span id="username"></span></div>
+      <div><strong>XP:</strong> <span id="XP"></span></div>
+      <!-- Add more divs for other information as needed -->
+    </div>
+    <div class="statistics">
+      <!-- SVG graphs will be dynamically added here -->
+    </div>
+    <button id="logout-btn" class="logout-btn">Logout</button>
+    <div>
+      <h2>XP Graph</h2>
+      <div id="chart-container"></div>
+      <div class="year-filter">
+        <h3>Year:</h3>
+        <button id="2021" onclick=searchByYear(2021)>2021</button>
+        <button id="2022" onclick=searchByYear(2022)>2022</button>
+        <button id="2023 "onclick=searchByYear(2023)>2023</button>
+      </div>
+      <button id="whole" class ="whole" onclick=searchByYear(0)>Whole</button>
+    </div>
+  </div>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

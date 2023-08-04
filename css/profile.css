@@ -1,0 +1,38 @@
+/* profile.css for profile.html */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  button{
+    border-radius: 60px;
+    padding: 10px 20px;
+    background-color: blue;
+    color: #fff;
+    border: black;
+    cursor: pointer;
+    width: auto;
+    text-align: center;
+}
+  
+h1 {
+  color: #333;
+  margin-top: 20px;
+}
+
+svg .dots .dot text {
+  display: none;
+}
+
+svg .dots :hover text {
+  display: block;
+}
+
+.logout-btn{
+  margin-top: 10px;
+}
+
+.whole{
+  margin-top: 10px;
+}
