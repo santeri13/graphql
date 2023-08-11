@@ -29,50 +29,16 @@ async function findUserId(jwtToken) {
   async function findDoneTasks(jwtToken, userId) {
     const query = `
       query {
-        user(where: { id: { _eq: ${userId}} }) {
-          login
-          progresses(where: {_and: [{path: {_iregex: "div-01/(?!piscine-js.*/)"} _and: {path: {_iregex: "div-01/(?!rust.*/)"}}}, {isDone: {_eq: true}}]}, order_by: {createdAt: asc}) {
-              path
-              createdAt
-              object {
-                  id
-              }
-          }
-      }
-      }
-    `;
-
-    const response = await fetch('https://01.kood.tech/api/graphql-engine/v1/graphql', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${jwtToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({query}),
-    });
-  
-    if (!response.ok) {
-      throw new Error('Failed to fetch transaction data.');
-    }
-    const data = await response.json();
-    return data;
-  }
-
-  async function findXP(jwtToken, userId, objectid) {
-    const query = `
-      query {
-        user(where: {id: {_eq: ${userId}}}) {
-          id
-          login
-          transactions(where: {objectId: {_eq: ${objectid}}}) {
-              amount
-              createdAt
-              path
-              object {
-                  name
-              }
-          }
-      }
+        transaction(where: {
+          userId: { _eq: ${userId}}
+          type: { _eq: "xp" }
+          path: {_nregex: "piscine-go|piscine-js-2-old/|rust/"}
+          eventId: { _gt: 0 }
+        }) {
+          amount
+          path
+          createdAt
+        }
       }
     `;
 
@@ -91,6 +57,7 @@ async function findUserId(jwtToken) {
     const data = await response.json();
     return data;
   }
+
 
 // Function to fetch user data from GraphQL endpoint
 async function getUserData(jwtToken, year) {
@@ -101,26 +68,24 @@ async function getUserData(jwtToken, year) {
     const xpData = [];
     const accumulatedPoints = [];
 
-    console.log(tasks.data.user[0].progresses)
-
-    for (const doneTasks of tasks.data.user[0].progresses) {
-        const exercise = await findXP(jwtToken, userId.id, doneTasks.object.id);
+    for (const doneTasks of tasks.data.transaction) {
 
         // Add the newDataPoint to the xpData array
-        if (xpData.find(({ path }) => path === exercise.data.user[0].transactions[0].path) === undefined){
           if (year === 2021 || year === 2022 || year === 2023){
-            var spiltDate = exercise.data.user[0].transactions[0].createdAt.toString().split('-');
+            var spiltDate = doneTasks.createdAt.toString().split('-');
             if (spiltDate[0] === year.toString()){
-              xpData.push(exercise.data.user[0].transactions[0]);
+              xpData.push(doneTasks);
+              // Calculate accumulated points for each data point
+              let accumulatedPoint = xpData.reduce((sum, dataPoint) => sum + dataPoint.amount, 0);
+              accumulatedPoints.push(accumulatedPoint)
             }
           }
           else{
-            xpData.push(exercise.data.user[0].transactions[0]);
+            xpData.push(doneTasks);
+            // Calculate accumulated points for each data point
+            let accumulatedPoint = xpData.reduce((sum, dataPoint) => sum + dataPoint.amount, 0);
+            accumulatedPoints.push(accumulatedPoint)
           }
-          // Calculate accumulated points for each data point
-          let accumulatedPoint = xpData.reduce((sum, dataPoint) => sum + dataPoint.amount, 0);
-          accumulatedPoints.push(accumulatedPoint)
-        }
     }
 
     xpData.sort(function(a,b){
@@ -159,7 +124,7 @@ async function getUserData(jwtToken, year) {
         .join((enter) => enter.append('text').attr('class', 'dot-label'))
         .attr('x', -50) // Adjust the x position of the label relative to the data point
         .attr('y', -10) // Adjust the y position of the label relative to the data point
-        .text((d) => d.object.name); // Display the name property for each data point
+        .text((d) => d.path.substring(d.path.indexOf('/johvi/div-01/') + 14)); // Display the name property for each data point
         
     // Call the x-axis and y-axis functions to update the axes
     graph.xAxisGroup.call(graph.xAxis);
